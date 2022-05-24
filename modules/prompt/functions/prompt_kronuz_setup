@@ -1,0 +1,569 @@
+#
+# Kronuz theme for Prezto.
+#
+# Authors:
+#   German M. Bravo (Kronuz) <german.mb@gmail.com>
+#
+#
+# Zsh Prompt Expansion:
+#   Special characters
+#   %%          - A ‘%’.
+#   %)          - A ‘)’.
+#
+#   Login information
+#   %l          - The line (tty) the user is logged in on, without ‘/dev/’ prefix.
+#   %M          - The full machine hostname.
+#   %m          - The hostname up to the first ‘.’.
+#   %n          - $USERNAME.
+#   %y          - The line (tty) the user is logged in on, without ‘/dev/’ prefix.
+#
+#   Shell state
+#   %#          - A ‘#’ if the shell is running with privileges, a ‘%’ if not. Equivalent to ‘%(!.#.%%)’.
+#   %?          - The return status of the last command executed just before the prompt.
+#   %_          - The status of the parser.
+#   %^          - The status of the parser in reverse.
+#   %d , %/     - Current working directory. If an integer follows the ‘%’, it specifies a number of trailing components.
+#   %~          - As %d and %/, but if the current working directory starts with $HOME, that part is replaced by a ‘~’.
+#   %e          - Evaluation depth of the current sourced file, shell function, or eval.
+#   %h, %!      - Current history event number.
+#   %i          - The line number currently being executed in the script.
+#   %I          - The line number currently being executed in the file %x.
+#   %j          - The number of jobs.
+#   %L          - The current value of $SHLVL.
+#   %N          - The name of the script, sourced file, or shell function that zsh is currently executing.
+#   %x          - The name of the file containing the source code currently being executed.
+#   %c, %., %C  - Trailing component of the current working directory.
+#
+#   Date and time
+#   %D          - The date in yy-mm-dd format.
+#   %T          - Current time of day, in 24-hour format.
+#   %t, %@      - Current time of day, in 12-hour, am/pm format.
+#   %*          - Current time of day in 24-hour format, with seconds.
+#   %w          - The date in day-dd format.
+#   %W          - The date in mm/dd/yy format.
+#   %D{string}  - string is formatted using the strftime function.
+#
+#   Visual effects
+#   %B (%b)     - Start (stop) boldface mode.
+#   %E          - Clear to end of line.
+#   %U (%u)     - Start (stop) underline mode.
+#   %S (%s)     - Start (stop) standout mode.
+#   %F (%f)     - Start (stop) using a different foreground colour.
+#   %K (%k)     - Start (stop) using a different bacKground colour. The syntax is identical to that for %F and %f.
+#   %{...%}     - The string within the braces should not change the cursor position. Brace pairs can nest.
+#   %G          - Within a %{...%} sequence, include a ‘glitch’. If an integer follows the ‘%’, it indicates character width.
+#
+#   Conditional Substrings in Prompts
+#   %v          - The value of the first element of the psvar array parameter.
+#   %(x.true-text.false-text)
+#               - Specifies a ternary expression. The separator character following the x is arbitrary.
+#                 The test character x may be any of the following:
+#                     !     - True if the shell is running with privileges.
+#                     #     - True if the effective uid of the current process is n.
+#                     ?     - True if the exit status of the last command was n.
+#                     _     - True if at least n shell constructs were started.
+#                     C /   - True if the current absolute path has at least n elements relative to the root directory.
+#                     c . ~ - True if the current path, with prefix replacement.
+#                     D     - True if the month is equal to n (January = 0).
+#                     d     - True if the day of the month is equal to n.
+#                     e     - True if the evaluation depth is at least n.
+#                     g     - True if the effective gid of the current process is n.
+#                     j     - True if the number of jobs is at least n.
+#                     L     - True if the SHLVL parameter is at least n.
+#                     l     - True if at least n characters have already been printed on the current line.
+#                     S     - True if the SECONDS parameter is at least n.
+#                     T     - True if the time in hours is equal to n.
+#                     t     - True if the time in minutes is equal to n.
+#                     v     - True if the array psvar has at least n elements.
+#                     V     - True if element n of the array psvar is set and non-empty.
+#                     w     - True if the day of the week is equal to n (Sunday = 0).
+#
+# Git Prompt Expansion:
+#   %a - added -
+#   %A - ahead -
+#   %B - behind -
+#   %b - branch <
+#   %C - clean -
+#   %c - commit <
+#   %d - deleted -
+#   %D - dirty -
+#   %i - indexed -
+#   %I - unindexed -
+#   %m - modified -
+#   %p - position <
+#   %R - remote >
+#   %r - renamed -
+#   %s - action >
+#   %S - stashed -
+#   %U - unmerged -
+#   %u - untracked -
+
+# Load dependencies.
+pmodload 'helper'
+
+unset col
+typeset -gA col
+col[black]='%F{0}'
+col[red]='%F{1}'
+col[lightgreen]='%F{10}'
+col[olive]='%F{100}'
+col[darkkhaki]='%F{101}'
+col[gray]='%F{102}'
+col[lavender]='%F{103}'
+col[mediumpurple]='%F{104}'
+col[mediumslateblue]='%F{105}'
+col[darkolivegreen]='%F{107}'
+col[darkseagreen]='%F{108}'
+col[powderblue]='%F{109}'
+col[lightyellow]='%F{11}'
+col[skyblue]='%F{110}'
+col[cornflowerblue]='%F{111}'
+col[lawngreen]='%F{112}'
+col[palegreen]='%F{114}'
+col[mediumaquamarine]='%F{115}'
+col[cadetblue]='%F{116}'
+col[lightskyblue]='%F{117}'
+col[chartreuse]='%F{118}'
+col[limegreen]='%F{119}'
+col[lightblue]='%F{12}'
+col[aquamarine]='%F{121}'
+col[darkred]='%F{124}'
+col[mediumvioletred]='%F{125}'
+col[darkmagenta]='%F{126}'
+col[purple]='%F{127}'
+col[darkviolet]='%F{128}'
+col[fuchsia]='%F{129}'
+col[lightmagenta]='%F{13}'
+col[chocolate]='%F{130}'
+col[lightcoral]='%F{131}'
+col[palevioletred]='%F{132}'
+col[orchid]='%F{133}'
+col[mediumorchid]='%F{134}'
+col[darkorchid]='%F{135}'
+col[darkgoldenrod]='%F{136}'
+col[burlywood]='%F{137}'
+col[rosybrown]='%F{138}'
+col[plum]='%F{139}'
+col[lightcyan]='%F{14}'
+col[violet]='%F{140}'
+col[khaki]='%F{143}'
+col[palegoldenrod]='%F{144}'
+col[darkgray]='%F{145}'
+col[slategray]='%F{146}'
+col[lightsteelblue]='%F{147}'
+col[yellowgreen]='%F{149}'
+col[lightgrey]='%F{15}'
+col[honeydew]='%F{151}'
+col[paleturquoise]='%F{152}'
+col[greenyellow]='%F{155}'
+col[dimgray]='%F{16}'
+col[tomato]='%F{160}'
+col[deeppink]='%F{161}'
+col[darkorange]='%F{166}'
+col[indianred]='%F{167}'
+col[hotpink]='%F{168}'
+col[navy]='%F{17}'
+col[goldenrod]='%F{172}'
+col[lightsalmon]='%F{173}'
+col[lightpink]='%F{175}'
+col[gold]='%F{178}'
+col[sandybrown]='%F{179}'
+col[darkblue]='%F{18}'
+col[tan]='%F{180}'
+col[mistyrose]='%F{181}'
+col[thistle]='%F{182}'
+col[lemonchiffon]='%F{187}'
+col[whitesmoke]='%F{188}'
+col[ghostwhite]='%F{189}'
+col[mediumblue]='%F{19}'
+col[azure]='%F{195}'
+col[orangered]='%F{196}'
+col[crimson]='%F{197}'
+col[green]='%F{2}'
+col[salmon]='%F{203}'
+col[orange]='%F{208}'
+col[coral]='%F{209}'
+col[peru]='%F{215}'
+col[darksalmon]='%F{216}'
+col[pink]='%F{218}'
+col[darkgreen]='%F{22}'
+col[navajowhite]='%F{223}'
+col[peachpuff]='%F{224}'
+col[teal]='%F{23}'
+col[lightgoldenrodyellow]='%F{230}'
+col[white]='%F{231}'
+col[darkcyan]='%F{24}'
+col[deepskyblue]='%F{25}'
+col[silver]='%F{250}'
+col[lightgray]='%F{251}'
+col[gainsboro]='%F{252}'
+col[dodgerblue]='%F{26}'
+col[yellow]='%F{3}'
+col[darkturquoise]='%F{31}'
+col[mediumspringgreen]='%F{35}'
+col[aqua]='%F{39}'
+col[blue]='%F{4}'
+col[lime]='%F{40}'
+col[springgreen]='%F{41}'
+col[magenta]='%F{5}'
+col[maroon]='%F{52}'
+col[indigo]='%F{54}'
+col[cyan]='%F{6}'
+col[lightslategray]='%F{60}'
+col[darkslateblue]='%F{61}'
+col[slateblue]='%F{62}'
+col[darkslategray]='%F{66}'
+col[steelblue]='%F{68}'
+col[royalblue]='%F{69}'
+col[grey]='%F{7}'
+col[mediumseagreen]='%F{78}'
+col[darkgrey]='%F{8}'
+col[mediumturquoise]='%F{80}'
+col[forestgreen]='%F{83}'
+col[turquoise]='%F{86}'
+col[lightred]='%F{9}'
+col[blueviolet]='%F{93}'
+col[brown]='%F{94}'
+
+
+function prompt_kronuz_colors {
+  # Use extended color pallete if available.
+  jailed="$(sysctl security.jail.jailed 2> /dev/null)"
+  if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY1='%(!.%B$col[red].%B$col[red])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY2='%(!.%B$col[red].%B$col[yellow])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY3='%(!.$col[red].%B$col[green])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STATUS_ERR='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STATUS_OK='$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_VENV='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_VIM='%B$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_EMACS='%B$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_OVERWRITE='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INSERT='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_COMPLETING='%B$col[black]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_ACTION='$col[darkorange]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_ADDED='$col[darkorange]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_AHEAD='$col[chartreuse]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_BEHIND='$col[deeppink]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_DIRTY='$col[brown]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_CLEAN='$col[forestgreen]' # 64 #5f8700
+    DEFAULT_PROMPT_KRONUZ_COLOR_BRANCH='%B$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_REMOTE='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_COMMIT='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_DELETED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_MODIFIED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_POSITION='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_RENAMED='$col[darkorange]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STASHED='$col[lightsteelblue]'  # #5fd7ff
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNMERGED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INDEXED='$col[darkorange]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNINDEXED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNTRACKED='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INFO='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_SEP='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_IP='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_TIME='$col[darkgrey]'
+    case $(hostname | tr '[:upper:]' '[:lower:]') in
+      *$USERNAME*)
+        DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[blue]'
+        DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[tomato].$col[aqua])'
+        DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[tomato].%B$col[white])'
+        ;;
+      *)
+        if [ "$jailed" = 'security.jail.jailed: 1' ] || [ -z "$jailed"]; then
+          DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[green]'
+          DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[tomato].$col[springgreen])'
+          DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[tomato].%B$col[white])'
+        else
+          DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[yellow]'
+          DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[tomato].$col[khaki])'
+          DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[tomato].%B$col[white])'
+        fi
+        ;;
+    esac
+  else
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY1='%(!.%B$col[red].%B$col[red])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY2='%(!.%B$col[red].%B$col[yellow])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_PRIMARY3='%(!.$col[red].%B$col[green])'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STATUS_ERR='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STATUS_OK='$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_VENV='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_VIM='%B$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_EMACS='%B$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_OVERWRITE='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INSERT='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_COMPLETING='%B$col[black]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_ACTION='$col[yellow]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_ADDED='$col[yellow]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_AHEAD='$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_BEHIND='$col[magenta]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_DIRTY='$col[yellow]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_CLEAN='$col[green]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_BRANCH='%B$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_REMOTE='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_COMMIT='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_DELETED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_MODIFIED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_POSITION='$col[white]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_RENAMED='$col[yellow]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_STASHED='$col[cyan]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNMERGED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INDEXED='$col[yellow]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNINDEXED='$col[red]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_UNTRACKED='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_INFO='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_SEP='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_IP='$col[darkgrey]'
+    DEFAULT_PROMPT_KRONUZ_COLOR_TIME='$col[darkgrey]'
+    case $(hostname | tr '[:upper:]' '[:lower:]') in
+      *$USERNAME*)
+        DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[blue]'
+        DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[red].$col[cyan])'
+        DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[red].%B$col[white])'
+        ;;
+      *)
+        if [ "$jailed" = 'security.jail.jailed: 1' ] || [ -z "$jailed"]; then
+          DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[green]'
+          DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[red].$col[green])'
+          DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[red].%B$col[white])'
+        else
+          DEFAULT_PROMPT_KRONUZ_COLOR_HOST='$col[yellow]'
+          DEFAULT_PROMPT_KRONUZ_COLOR_PWD='%(!.$col[red].$col[yellow])'
+          DEFAULT_PROMPT_KRONUZ_COLOR_USER='%(!.%B$col[red].%B$col[white])'
+        fi
+        ;;
+    esac
+  fi
+  DEFAULT_PROMPT_KRONUZ_COLOR_NONE='%b%u%s%f%k'
+}
+
+
+function prompt_kronuz_async_callback {
+  echo "prompt_kronuz_async_callback '$1'" >> /tmp/prompt_kronuz
+  case $1 in
+    prompt_kronuz_async_git)
+      if [[ $3 = *"\xff"* ]]; then
+        # No git target detected, flush the git fragment and redisplay the prompt.
+        _prompt_kronuz_git=''
+        zle && zle reset-prompt
+      else
+        # Git target detected, update the git fragment and redisplay the prompt.
+        _prompt_kronuz_git="$3"
+        zle && zle reset-prompt
+      fi
+      ;;
+  esac
+}
+
+function prompt_kronuz_async_git {
+  cd -q "$1"
+  if (( $+functions[git-info] )); then
+    echo "prompt_kronuz_async_git '$1'" >> /tmp/prompt_kronuz
+    # Get default colors
+    prompt_kronuz_colors
+    # Run git info
+    git-info
+    print "${git_info:+${(e)git_info[status]}}"
+  else
+    echo "prompt_kronuz_async_git '$1' (no git)" >> /tmp/prompt_kronuz
+  fi
+}
+
+function prompt_kronuz_async_tasks {
+  # Initialize async worker. This needs to be done here and not in
+  # prompt_kronuz_setup so the git formatting can be overridden by other prompts.
+  if (( !${prompt_kronuz_async_init:-0} )) || (! zpty -t "prompt_kronuz"); then
+    echo "async_start_worker 'prompt_kronuz'" >> /tmp/prompt_kronuz
+    async_start_worker "prompt_kronuz" -n
+    echo "async_register_callback 'prompt_kronuz'" >> /tmp/prompt_kronuz
+    async_register_callback "prompt_kronuz" prompt_kronuz_async_callback
+    typeset -g prompt_kronuz_async_init=1
+  fi
+
+  # Kill the old process of slow commands if it is still running.
+  async_flush_jobs "prompt_kronuz"
+
+  # Compute slow commands in the background.
+  echo "async_job 'prompt_kronuz' prompt_kronuz_async_git '$PWD'" >> /tmp/prompt_kronuz
+  async_job "prompt_kronuz" prompt_kronuz_async_git "$PWD"
+}
+
+function prompt_kronuz_precmd {
+  echo "prompt_kronuz_precmd" >> /tmp/prompt_kronuz
+
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Get default colors
+  prompt_kronuz_colors
+
+  # Format PWD.
+  #_prompt_kronuz_pwd=$(prompt-pwd)  # <- shortened path
+  _prompt_kronuz_pwd=%~
+
+  # Handle updating git data. We also clear the git prompt data if we're in a
+  # different git root now.
+  if (( $+functions[git-dir] )); then
+    local new_git_root="$(git-dir 2> /dev/null)"
+    if [[ $new_git_root != $_kronuz_cur_git_root ]]; then
+      _prompt_kronuz_git=''
+      _kronuz_cur_git_root=$new_git_root
+    fi
+  fi
+
+  vcs_info 'prompt'
+
+  # Run python info (this should be fast and not require any async)
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+
+  prompt_kronuz_async_tasks
+}
+
+
+function prompt_kronuz_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+  autoload -Uz async && async
+  autoload -Uz vcs_info
+
+  # Add hook for doing stuff before each command.
+  add-zsh-hook precmd prompt_kronuz_precmd
+
+  local -a COLORS
+  COLORS=(action added ahead behind branch clean commit completing deleted
+    dirty host indexed info insert ip modified none overwrite position primary1
+    primary2 primary3 pwd remote renamed sep stashed status_err status_ok time
+    unindexed unmerged untracked user venv vim emacs)
+
+  typeset -A fcol
+  for color in "${COLORS[@]}" ; do
+    C="\${(e)PROMPT_KRONUZ_COLOR_${color:u}:-\$DEFAULT_PROMPT_KRONUZ_COLOR_${color:u}}"
+    col[$color]="$C"
+    fcol[$color]="\${$C//\%/%%}"
+  done
+
+  # The target actually contains 3 space separated possibilities,
+  # so we need to make sure we grab the first one or flag no-target (\xff).
+  PROMPT_KRONUZ_GIT_TARGET='$(coalesce "%b" "%p" "%c" "\xff")'
+  PROMPT_KRONUZ_GIT_REMOTE='%R%s'
+  PROMPT_KRONUZ_GIT_ICONS='%S%D%C%A%B%a%i%I%d%m%r%u%U'
+
+  # Tell prezto we can manage this prompt
+  zstyle ':prezto:module:prompt' managed 'yes'
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format "$col[completing]...$col[none]"
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "$col[primary3]❮$col[none]$col[primary2]❮$col[none]$col[primary1]❮$col[none]"
+  zstyle ':prezto:module:editor:info:keymap:primary' format "$col[primary1]❯$col[none]$col[primary2]❯$col[none]$col[primary3]❯$col[none]"
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format " $col[overwrite]♺$col[none]"
+  # zstyle ':prezto:module:editor:info:keymap:primary:insert' format " $col[insert]▼$col[none]"
+
+  # Set vcs_info parameters.
+  local branch_format=" $fcol[info]%s$fcol[sep]:$fcol[none]$fcol[branch]${_prompt_steeef_colors[1]}%b$fcol[none]"
+  local action_format="$fcol[sep]($fcol[none]${fcol[sep]}%a$fcol[sep])$fcol[none]"
+  zstyle ':vcs_info:*' enable bzr hg svn
+  zstyle ':vcs_info:*:prompt:*' check-for-changes true
+  zstyle ':vcs_info:*:prompt:*' unstagedstr "${fcol[clean]}✔$fcol[none]"
+  zstyle ':vcs_info:*:prompt:*' stagedstr "${fcol[dirty]}✗$fcol[none]"
+  zstyle ':vcs_info:*:prompt:*' actionformats "${branch_format}${action_format} %c%u"
+  zstyle ':vcs_info:*:prompt:*' formats "${branch_format} %c%u"
+  zstyle ':vcs_info:*:prompt:*' nvcsformats ""
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:status:ignore' submodules 'all'  # Not setting this checks all modules (which can be really slow)
+  if [ "$1" = "lite" ]; then
+    zstyle ':prezto:module:git:info' verbose 'no'  # this is faster, adds status for: indexed, unindexed
+  else
+    zstyle ':prezto:module:git:info' verbose 'yes'  # this is slower, adds status for: added, deleted, modified, renamed, unmerged
+  fi
+  zstyle ':prezto:module:git:info:branch' format "$fcol[sep]:$fcol[branch]%b$fcol[none]"
+  zstyle ':prezto:module:git:info:remote' format "$fcol[sep]:$fcol[remote]%R$fcol[none]"
+  zstyle ':prezto:module:git:info:position' format "$fcol[sep]:$fcol[position]%p$fcol[none]"
+  zstyle ':prezto:module:git:info:commit' format "$fcol[sep]:$fcol[commit]%.7c$fcol[none]"
+  zstyle ':prezto:module:git:info:action' format "$fcol[sep]:$fcol[action]%s$fcol[none]"
+  zstyle ':prezto:module:git:info:indexed' format "$fcol[indexed]✛$fcol[none]"
+  zstyle ':prezto:module:git:info:added' format "$fcol[added]✛$fcol[none]"
+  zstyle ':prezto:module:git:info:ahead' format "$fcol[ahead]⇡$fcol[none]"
+  zstyle ':prezto:module:git:info:behind' format "$fcol[behind]⇣$fcol[none]"
+  zstyle ':prezto:module:git:info:dirty' format "$fcol[dirty]✗$fcol[none]"
+  zstyle ':prezto:module:git:info:clean' format "$col[clean]✔$col[none]"  # Clean is unformatted
+  zstyle ':prezto:module:git:info:deleted' format "$fcol[deleted]✖$fcol[none]"
+  zstyle ':prezto:module:git:info:unindexed' format "$fcol[unindexed]✴$fcol[none]"
+  zstyle ':prezto:module:git:info:modified' format "$fcol[modified]✴$fcol[none]"
+  zstyle ':prezto:module:git:info:renamed' format "$fcol[renamed]↹$fcol[none]"
+  zstyle ':prezto:module:git:info:stashed' format "$fcol[stashed]⼐$fcol[none]"
+  zstyle ':prezto:module:git:info:unmerged' format "$fcol[unmerged]❖$fcol[none]"
+  zstyle ':prezto:module:git:info:untracked' format " $fcol[untracked]⊖$fcol[none]"
+  zstyle ':prezto:module:git:info:keys' format \
+    'status' " $fcol[info]git$fcol[none]$PROMPT_KRONUZ_GIT_TARGET$PROMPT_KRONUZ_GIT_REMOTE$fcol[sep]($fcol[none]$PROMPT_KRONUZ_GIT_ICONS$fcol[sep])$fcol[none]"
+
+  # Set python-info parameters.
+  zstyle ':prezto:module:python:info:virtualenv' format " $col[info]venv$col[none]:$col[venv]%v$col[none]"
+
+  # Get the async worker set up.
+  _kronuz_cur_git_root=''
+
+  _prompt_kronuz_git=''
+  _prompt_kronuz_pwd=''
+
+  DEFAULT_PROMPT_KRONUZ_ERR="%(?.$col[status_ok]•$col[none].$col[status_err]•$col[none])"
+  DEFAULT_PROMPT_KRONUZ_ERROR="%(?.. $col[status_err]⏎ %?$col[none])"
+  DEFAULT_PROMPT_KRONUZ_VIM="\${VIM:+\" $col[vim]V$col[none]\"}"
+  DEFAULT_PROMPT_KRONUZ_EMACS="\${INSIDE_EMACS:+\" $col[emacs]E$col[none]\"}"
+  DEFAULT_PROMPT_KRONUZ_USER="%n"
+  DEFAULT_PROMPT_KRONUZ_IP="\$({ /sbin/ifconfig | grep 'inet ' | grep -v '127.0.0.1' ; /sbin/ifconfig | grep 'inet6 ' | grep -v '::1' ; } | head -1 | awk '{print \$2;}')"
+  DEFAULT_PROMPT_KRONUZ_GIT="\${_prompt_kronuz_git:+\${(e)_prompt_kronuz_git}}"
+  DEFAULT_PROMPT_KRONUZ_VENV="\${python_info:+\${(e)python_info[virtualenv]}}"
+  DEFAULT_PROMPT_KRONUZ_OVERWRITE="\${editor_info:+\${(e)editor_info[overwrite]}}"
+  DEFAULT_PROMPT_KRONUZ_PROMPT="\${editor_info:+\${(e)editor_info[keymap]}}"
+  DEFAULT_PROMPT_KRONUZ_TIME="[%*]"
+  DEFAULT_PROMPT_KRONUZ_PWD="\${_prompt_kronuz_pwd:+\${(e)_prompt_kronuz_pwd}}"
+
+  unset kronuz
+  typeset -gA kronuz
+  kronuz[nl]=$'%E\n'
+  kronuz[err]="\${(e)PROMPT_KRONUZ_ERR:-\$DEFAULT_PROMPT_KRONUZ_ERR}"
+  kronuz[error]="\${(e)PROMPT_KRONUZ_ERROR:-\$DEFAULT_PROMPT_KRONUZ_ERROR}"
+  kronuz[vim]="\${(e)PROMPT_KRONUZ_VIM:-\$DEFAULT_PROMPT_KRONUZ_VIM}"
+  kronuz[emacs]="\${(e)PROMPT_KRONUZ_EMACS:-\$DEFAULT_PROMPT_KRONUZ_EMACS}"
+  kronuz[user]="$col[user]\${(e)PROMPT_KRONUZ_USER:-\$DEFAULT_PROMPT_KRONUZ_USER}$col[none]"
+  kronuz[git]="\${(e)PROMPT_KRONUZ_GIT:-\$DEFAULT_PROMPT_KRONUZ_GIT}"
+  kronuz[vcs]="\${(e)vcs_info_msg_0_} \${(e)vcs_info_msg_1_}"
+  kronuz[venv]="\${(e)PROMPT_KRONUZ_VENV:-\$DEFAULT_PROMPT_KRONUZ_VENV}"
+  kronuz[overwrite]="\${(e)PROMPT_KRONUZ_OVERWRITE:-\$DEFAULT_PROMPT_KRONUZ_OVERWRITE}"
+  kronuz[prompt]="\${(e)PROMPT_KRONUZ_PROMPT:-\$DEFAULT_PROMPT_KRONUZ_PROMPT}"
+  kronuz[time]="$col[time]\${(e)PROMPT_KRONUZ_TIME:-\$DEFAULT_PROMPT_KRONUZ_TIME}$col[none]"
+  kronuz[pwd]="$col[pwd]\${(e)PROMPT_KRONUZ_PWD:-\$DEFAULT_PROMPT_KRONUZ_PWD}$col[none]"
+  kronuz[host]="$col[host]%M$col[none] $col[ip](\${(e)PROMPT_KRONUZ_IP:-\$DEFAULT_PROMPT_KRONUZ_IP})$col[none]"
+  kronuz[info]="$kronuz[user] at $kronuz[host]"
+
+  # Define prompts.
+  SPROMPT='zsh: correct $col[red]%R%f to $col[green]%r%f [nyae]? '
+  RPROMPT="$kronuz[overwrite]$kronuz[vim]$kronuz[emacs]"
+  PROMPT="$kronuz[err]$kronuz[info]$kronuz[git]$kronuz[vcs]$kronuz[venv]$kronuz[error]$kronuz[nl]$kronuz[time] $kronuz[pwd] $kronuz[prompt] "
+}
+
+
+function prompt_kronuz_help {
+  cat <<EOH
+  prompt kronuz [lite]
+EOH
+}
+
+
+function prompt_kronuz_preview {
+  local +h PROMPT=''
+  local +h RPROMPT=''
+  local +h SPROMPT=''
+
+  editor-info 2> /dev/null
+  prompt_preview_theme 'kronuz'
+}
+
+prompt_kronuz_setup "$@"
