@@ -11,3 +11,42 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+# fpath=("/usr/local/bin/" $fpath)  # Add homebrew to the completion path
+
+# directory
+setopt CLOBBER  # Make > and >> work as expected (override for directory module)
+
+# completion
+# setopt MENU_COMPLETE  # Insert the first completion match immediately. (override for completion module)
+
+# history
+setopt HIST_NO_STORE  # Remove the history command from the history when invoked.
+setopt HIST_NO_FUNCTIONS  # Do not store function definitions in the history list.
+setopt HIST_REDUCE_BLANKS  # Remove superfluous blanks from each command line being added to the history list.
+zshaddhistory() { (( ${#${(f)1}} < 3 )) }  # Avoid large commands to be stored in the history.
+
+# editor
+bindkey '^U' backward-kill-line  # Bind Ctrl+U to backward-kill-line rather than kill-whole-line.
+bindkey '^[^[[D' backward-word  # Bind Alt+left to backward-word
+bindkey '^[^[[C' forward-word  # Bind Alt+right to forward-word
+
+# Options
+setopt NUMERIC_GLOB_SORT  # Sort the filenames numerically rather than lexicographically.
+setopt RM_STAR_SILENT  # Do not query the user before executing rm * or rm path/*.
+setopt RM_STAR_WAIT  # 10 second wait if you do something that will delete everything.
+
+unsetopt CORRECT  # Do not try to correct the spelling of commands.
+unsetopt CORRECT_ALL  # Do not try to correct the spelling of all arguments in a line.
+unsetopt HUP  # Do not send the HUP signal to running jobs when the shell exits.
+
+PS2=  # remove "heredoc>" command line from heredocs (instead of default's '%_> ')
+
+# Google Cloud SDK PATH and shell command completion for gcloud:
+if [ -d '/usr/local/google-cloud-sdk' ]; then
+	source '/usr/local/google-cloud-sdk/path.zsh.inc'
+	source '/usr/local/google-cloud-sdk/completion.zsh.inc'
+fi
+
+if [ -x '/usr/local/google-cloud-sdk/bin/kubectl' ]; then
+	source <(kubectl completion zsh)
+fi

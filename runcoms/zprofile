@@ -71,3 +71,16 @@ fi
 if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
+
+
+#
+# Also include /etc/profile if available
+#
+
+if [[ -s "/etc/profile" ]]; then
+  source "/etc/profile"
+fi
+
+if [[ -s "$HOME/.profile" ]]; then
+  source "$HOME/.profile"
+fi
